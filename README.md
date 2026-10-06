@@ -21,7 +21,21 @@ Or from inside a session: `/plugin install prompt-boost --marketplace GururOzatm
 
 Run `/reload-plugins` in a running session to load them.
 
+> If the install says `userConfig options not yet set`, ignore it: every option has a default and the mods work as installed. Use `/plugin configure <mod>@claude-mods` only to turn something off.
+
 ## prompt-boost
+
+Type a rough prompt with `++`; the marker turns orange:
+
+![Typing a prompt with ++](docs/images/boost-1-typing.png)
+
+Press Enter. The prompt is held while it is rewritten:
+
+![Boosting prompt](docs/images/boost-2-boosting.png)
+
+The clean version lands back in the box for you to review, edit or send:
+
+![Rewritten prompt in the box](docs/images/boost-3-result.png)
 
 | You type | Result |
 |---|---|
@@ -37,6 +51,14 @@ Run `/reload-plugins` in a running session to load them.
 
 ## reply-tools
 
+A copy button on every code block, and `↓ tl;dr` under long replies:
+
+![Reply with copy and tl;dr buttons](docs/images/reply-copy-tldr-button.png)
+
+One click gives a short summary that answers your question; `↑ original` switches back:
+
+![tl;dr of the reply](docs/images/reply-tldr.png)
+
 - `⧉ copy N` above each code block copies only that block.
 - `⧉ copy all N` on the first of several shell blocks copies them joined.
 - `/cb N` copies block N of the last reply, `/cb all` every shell block, `/cb` lists them.
@@ -46,6 +68,12 @@ Run `/reload-plugins` in a running session to load them.
 Toggles (`/plugin configure reply-tools@claude-mods`): `copy_buttons`, `copy_instruction`, `tldr_button`.
 
 ## jump-list
+
+<img src="docs/images/jump-list-pane.png" alt="Jump list pane" width="232" align="right">
+
+Every prompt with its send time. Click one to jump there, `↓ end` to go to the bottom, `–` to collapse:
+
+![Collapsed jump list above the prompt](docs/images/jump-list-collapsed.png)
 
 - Prompts are read from the session transcript in order, with their send time, also after a resume. Large transcripts are streamed.
 - On-screen prompts are bright; `✎` marks a turn that edited files, `✗` a failed command.
