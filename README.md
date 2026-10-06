@@ -1,14 +1,6 @@
 # claude-mods
 
-Three mods for [Claude Code](https://code.claude.com/docs/en/plugins/mods/overview) (v2.1.287+). Install only the ones you want.
-
-| Mod | What it does |
-|---|---|
-| **prompt-boost** | Put `++` at the start or end of a rough prompt. It is rewritten into clear English and put back in the prompt box for you to review before sending. |
-| **reply-tools** | A copy button above every code block, `copy all` for consecutive shell commands, and a one-click `tl;dr` for long replies. |
-| **jump-list** | A side pane listing every prompt of the session with its time. Click one to jump back to it; `↓ end` jumps to the bottom. |
-
-## Install
+Three small mods for [Claude Code](https://code.claude.com/docs/en/plugins/mods/overview). Install the ones you want.
 
 ```bash
 claude plugin marketplace add GururOzatmaca/claude-mods
@@ -17,95 +9,42 @@ claude plugin install reply-tools@claude-mods
 claude plugin install jump-list@claude-mods
 ```
 
-Or from inside a session: `/plugin install prompt-boost --marketplace GururOzatmaca/claude-mods`.
-
-Run `/reload-plugins` in a running session to load them.
-
-> If the install says `userConfig options not yet set`, ignore it: every option has a default and the mods work as installed. Use `/plugin configure <mod>@claude-mods` only to turn something off.
+Needs Claude Code 2.1.287 or newer. If the install says `options not yet set`, ignore it; the defaults work.
 
 ## prompt-boost
 
-Type a rough prompt with `++`; the marker turns orange:
+Add `++` to a messy prompt. It gets rewritten in clear English and put back in the box. You check it, then press Enter.
 
 ![Typing a prompt with ++](docs/images/boost-1-typing.png)
-
-Press Enter. The prompt is held while it is rewritten:
-
-![Boosting prompt](docs/images/boost-2-boosting.png)
-
-The clean version lands back in the box for you to review, edit or send:
-
 ![Rewritten prompt in the box](docs/images/boost-3-result.png)
 
-| You type | Result |
-|---|---|
-| `++ price wrong when i pick gift wrap, fix pls` | Haiku fixes the wording only: `The price is wrong when I pick gift wrap. Fix it.` |
-| `fix it ++` | Same, with the marker at the end |
-| `++o ...` | Uses Opus instead of Haiku |
-| `++q ...` / `++oq ...` | Structured rewrite with scope, a "Done when" check and up to 3 open questions |
-
-- The rewrite never adds requirements and keeps every name, path, error and command verbatim.
-- The `++` turns orange as you type. `Boosting prompt...` shows while it works.
-- `/ap` shows the last original next to its rewrite; `/ap undo` puts the original back.
-- One model call per boosted prompt. Normal prompts are untouched.
+- `++` at the start or end. `++o` uses Opus, `++q` adds open questions.
+- Only the wording changes. Names, paths and errors stay exactly as you wrote them.
+- `/ap undo` brings back your original.
 
 ## reply-tools
 
-A copy button on every code block, and `↓ tl;dr` under long replies:
+A copy button on every code block, and a `tl;dr` button under long replies.
 
 ![Reply with copy and tl;dr buttons](docs/images/reply-copy-tldr-button.png)
-
-One click gives a short summary that answers your question; `↑ original` switches back:
-
 ![tl;dr of the reply](docs/images/reply-tldr.png)
 
-- `⧉ copy N` above each code block copies only that block.
-- `⧉ copy all N` on the first of several shell blocks copies them joined.
-- `/cb N` copies block N of the last reply, `/cb all` every shell block, `/cb` lists them.
-- `↓ tl;dr` under replies of 15+ lines: a Sonnet summary of at most 100 words that keeps every step, status, warning and condition. `↑ original` switches back. Display only; Claude's context is unchanged.
-- Adds a short system prompt section asking Claude to put copyable text (commands, messages, config) in code blocks.
-
-Toggles (`/plugin configure reply-tools@claude-mods`): `copy_buttons`, `copy_instruction`, `tldr_button`.
+- `⧉ copy all` copies several shell commands at once.
+- `tl;dr` keeps every step and warning. `↑ original` switches back.
+- Turn parts off with `/plugin configure reply-tools@claude-mods`.
 
 ## jump-list
 
-<img src="docs/images/jump-list-pane.png" alt="Jump list pane" width="232" align="right">
+A side list of every prompt in the session, with its time. Click one to jump back.
 
-Every prompt with its send time. Click one to jump there, `↓ end` to go to the bottom, `–` to collapse:
+<img src="docs/images/jump-list-pane.png" alt="Jump list" width="232">
 
-![Collapsed jump list above the prompt](docs/images/jump-list-collapsed.png)
+- `↓ end` goes to the bottom. `–` folds it into one line.
+- Works after resume too. Open it with `/jumps`.
+- Needs the fullscreen layout. A very old prompt may need a second click.
 
-- Prompts are read from the session transcript in order, with their send time, also after a resume. Large transcripts are streamed.
-- On-screen prompts are bright; `✎` marks a turn that edited files, `✗` a failed command.
-- `–` collapses the pane into a one-line `› Jumps (N)` button above the prompt.
-- `/jumps` opens it. Opens on start when the terminal is 144+ columns wide (`open_on_start`).
+## Good to know
 
-Limits:
-- Clicking and jumping need Claude Code's fullscreen layout.
-- A prompt far above the screen may need a second click to land exactly, because Claude Code only draws rows near the screen.
-- Streaming large transcripts uses `cat` (Linux, macOS).
+Mods run with your permissions. prompt-boost and tl;dr make one model call each time you use them. jump-list reads the session's transcript file. Run `claude plugin validate <folder>` to see exactly what a mod does.
 
-## What these mods can reach
-
-Mods run inside Claude Code with your permissions. Run `claude plugin validate <folder>` to see each mod's hooks and calls.
-
-| Mod | Reads | Model calls | Other |
-|---|---|---|---|
-| prompt-boost | your prompt, last 6 messages | Haiku or Opus, per `++` prompt | none |
-| reply-tools | replies | Sonnet, per tl;dr click | clipboard |
-| jump-list | the session transcript file | none | runs `cat` on the transcript |
-
-## Development
-
-```bash
-claude plugin validate ./prompt-boost
-claude plugin test ./prompt-boost
-npx tsx evals/run.ts boost
-npx tsx evals/run.ts tldr
-```
-
-`evals/` runs the rewrite and tl;dr prompts against real models on fixed cases and checks the outputs. Set `EVAL_MODEL` to try another model.
-
-## License
-
-MIT
+MIT license.
