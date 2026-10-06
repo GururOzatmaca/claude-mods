@@ -101,15 +101,24 @@ export const register: Register = on => {
     })
     stopBoosting($)
     const seconds = Math.round(((await $.clock.now()) - started) / 100) / 10
+    const hasAttachments = (e.attachments?.length ?? 0) > 0
 
     if (!result.isAnswered || result.text.trim() === '') {
-      await $.prompt.fill({ text: trigger.raw })
       const reason = result.isAnswered ? 'empty reply' : result.reason
+      if (hasAttachments) {
+        $.ui.toast(`Boost failed (${reason}); sent the original with its images`)
+        return next({ ...e, text: trigger.raw })
+      }
+      await $.prompt.fill({ text: trigger.raw })
       return { drop: `prompt-boost: rewrite failed (${reason}). Original restored to the prompt box.` }
     }
 
     const rewrite = result.text.trim()
     last = { original: trigger.raw, rewrite, model: trigger.model, seconds }
+    if (hasAttachments) {
+      $.ui.toast('Boosted and sent with images. /ap shows the rewrite')
+      return next({ ...e, text: rewrite })
+    }
     await $.prompt.fill({ text: rewrite })
 
     return { drop: NOTICE_MARKER }
@@ -117,6 +126,10 @@ export const register: Register = on => {
     const trigger = parseTrigger(e.text)
     if (trigger === undefined) return next(e)
     stopBoosting($)
+    if ((e.attachments?.length ?? 0) > 0) {
+      $.ui.toast('Boost errored; sent the original with its images')
+      return next({ ...e, text: trigger.raw })
+    }
     await $.prompt.fill({ text: trigger.raw })
     return { drop: 'prompt-boost: rewrite errored. Original restored to the prompt box.' }
   })
