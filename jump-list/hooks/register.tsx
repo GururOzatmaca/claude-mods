@@ -250,24 +250,29 @@ export const register: Register = (on, options) => {
     const { Box, Button, Text } = $.ui.resolve(e)
     const width = Math.max(12, e.props.bodyColumns)
     const isFullscreen = e.viewport?.isFullscreen
+    const rows = entries.map((entry, i) => (
+      <Button
+        key={`jump-${i}`}
+        label={label(entry, width)}
+        plain
+        dimColor={entry.isVisible !== true}
+        onPress={() => void jump($, i)}
+      />
+    ))
+    if (entries.length > 0) rows.push(<Button key="jump-end" label="↓ end" plain onPress={() => void jumpToEnd($)} />)
+    const pinAt = Math.min(Math.max(0, e.props.scroll.offset), rows.length)
 
     return (
       <Box flexDirection="column">
-        <Box flexDirection="row" justifyContent="flex-end" paddingRight={1}>
-          <Button key="collapse" label="–" plain dimColor onPress={() => void setCollapsed($, true)} />
+        {rows.slice(0, pinAt)}
+        <Box key="header" flexDirection="column">
+          <Box flexDirection="row" justifyContent="flex-end" paddingRight={1}>
+            <Button key="collapse" label="–" plain dimColor onPress={() => void setCollapsed($, true)} />
+          </Box>
+          {isFullscreen === false && <Text dimColor>Not fullscreen: no position or jumps.</Text>}
+          {entries.length === 0 && <Text dimColor>No prompts yet.</Text>}
         </Box>
-        {isFullscreen === false && <Text dimColor>Not fullscreen: no position or jumps.</Text>}
-        {entries.length === 0 && <Text dimColor>No prompts yet.</Text>}
-        {entries.map((entry, i) => (
-          <Button
-            key={`jump-${i}`}
-            label={label(entry, width)}
-            plain
-            dimColor={entry.isVisible !== true}
-            onPress={() => void jump($, i)}
-          />
-        ))}
-        {entries.length > 0 && <Button key="jump-end" label="↓ end" plain onPress={() => void jumpToEnd($)} />}
+        {rows.slice(pinAt)}
       </Box>
     )
   })
