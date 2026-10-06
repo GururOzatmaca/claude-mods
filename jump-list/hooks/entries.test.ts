@@ -13,6 +13,13 @@ test('history order is kept and slash commands or wrapped rows are skipped', asy
   expect(entries.map(e => e.text)).toEqual(['in here 10', 'asdasda', 'give me lorem'])
 })
 
+test('a pasted prompt is kept and its label shows the pasted text', async () => {
+  const entries = fromHistory('\n\n<pasted_content id="7718">\nThe taxes should not be compounded.\n</pasted_content>\nis this done?')
+  expect(entries).toHaveLength(1)
+  expect(label(entries[0]!, 40)).toBe('The taxes should not be compounded. is …')
+  expect(seeRow(entries, 'row', 'The taxes should not be compounded.\nis this done?', true)).toBe('matched')
+})
+
 test('rows drawn bottom-up still keep the list in history order', async () => {
   const entries = fromHistory('a', 'b', 'c')
   expect(seeRow(entries, 'id-c', 'c', true)).toBe('matched')

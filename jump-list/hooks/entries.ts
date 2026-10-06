@@ -10,12 +10,18 @@ export function clockTime(at: number | undefined): string {
 
 const MARK_GLYPH: Record<Mark, string> = { edit: '✎', fail: '✗' }
 
+const PASTE_TAG = /<\/?pasted_content(?:\s[^>]*)?>/g
+
+export function unwrap(text: string): string {
+  return text.replace(PASTE_TAG, '')
+}
+
 export function preview(text: string): string {
-  return text.replace(/\s+/g, ' ').trim()
+  return unwrap(text).replace(/\s+/g, ' ').trim()
 }
 
 export function isPrompt(text: string): boolean {
-  const clean = text.trim()
+  const clean = unwrap(text).trim()
   return clean !== '' && !clean.startsWith('/') && !clean.startsWith('<') && !clean.startsWith('[Request interrupted')
 }
 

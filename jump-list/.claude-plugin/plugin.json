@@ -1,6 +1,6 @@
 {
   "name": "jump-list",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "description": "A side pane listing every prompt in the session: see where you are, click to jump back",
   "author": { "name": "Gurur Ozatmaca" },
   "userConfig": {

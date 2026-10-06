@@ -131,25 +131,29 @@ async function readRows($: EngineInterface, path: string): Promise<{ rows: Trans
 }
 
 async function seed($: EngineInterface, knownPath?: string) {
-  entries.length = 0
-  isAwaitingEndLine = true
-  endId = undefined
-  endLineId = undefined
+  const fresh: Entry[] = []
+  let freshEndId: string | undefined
+  let source: string
   lastSeedAt = await $.clock.now()
   try {
     const path = knownPath ?? (await findTranscript($))
     if (path === undefined) throw new Error('transcript not found')
     lastPath = path
     const { rows, how } = await readRows($, path)
-    for (const prompt of rows.prompts) addPrompt(entries, prompt.text, prompt.uuid, prompt.at)
-    endId = rows.lastAnswer
-    historySource = `transcript (${how}), ${rows.prompts.length} prompts`
+    for (const prompt of rows.prompts) addPrompt(fresh, prompt.text, prompt.uuid, prompt.at)
+    freshEndId = rows.lastAnswer
+    source = `transcript (${how}), ${rows.prompts.length} prompts`
   } catch (error) {
     for (const message of await $.session.messages()) {
-      if (message.role === 'user') addPrompt(entries, message.text)
+      if (message.role === 'user') addPrompt(fresh, message.text)
     }
-    historySource = `history without ids (${String(error).slice(0, 60)})`
+    source = `history without ids (${String(error).slice(0, 60)})`
   }
+  entries.splice(0, entries.length, ...fresh)
+  endId = freshEndId
+  endLineId = undefined
+  isAwaitingEndLine = true
+  historySource = source
   scheduleRedraw($)
 }
 
