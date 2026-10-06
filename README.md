@@ -41,7 +41,7 @@ A side list of every prompt in the session, with its time. Click one to jump bac
 
 - `↓ end` goes to the bottom. `–` folds it into one line.
 - Works after resume too. Open it with `/jumps`.
-- Needs the fullscreen layout. A very old prompt may need a second click.
+- A very old prompt may need a second click.
 
 ## Good to know
 

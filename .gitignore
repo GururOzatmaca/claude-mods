@@ -2,3 +2,4 @@
 */tsconfig.json
 evals/results/
 node_modules/
+.tsconfig.check.json

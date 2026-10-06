@@ -7,6 +7,8 @@ const PANE = 'jump-list'
 const PANE_COLUMNS = 36
 const REDRAW_DELAY_MS = 60
 const SETTLE_TRIES = 4
+const RESEED_DELAY_MS = 2000
+const RESEED_MIN_GAP_MS = 30000
 const WALK_SETTLE_MS = 150
 const EDIT_TOOLS = new Set(['Edit', 'Write', 'MultiEdit', 'NotebookEdit'])
 
@@ -21,6 +23,22 @@ const seenEndLines = new Set<string>()
 let historySource = 'not loaded'
 let isCollapsed = false
 let isReseating = false
+let lastPath: string | undefined
+let lastSeedAt = 0
+let pendingReseed: Timer | undefined
+
+function scheduleReseed($: EngineInterface) {
+  if (pendingReseed !== undefined) return
+  pendingReseed = $.clock.after(RESEED_DELAY_MS, () => {
+    pendingReseed = undefined
+    void reseedIfStale($)
+  })
+}
+
+async function reseedIfStale($: EngineInterface) {
+  if ((await $.clock.now()) - lastSeedAt < RESEED_MIN_GAP_MS) return
+  await seed($, lastPath)
+}
 
 async function setCollapsed($: EngineInterface, collapsed: boolean) {
   isCollapsed = collapsed
@@ -117,9 +135,11 @@ async function seed($: EngineInterface, knownPath?: string) {
   isAwaitingEndLine = true
   endId = undefined
   endLineId = undefined
+  lastSeedAt = await $.clock.now()
   try {
     const path = knownPath ?? (await findTranscript($))
     if (path === undefined) throw new Error('transcript not found')
+    lastPath = path
     const { rows, how } = await readRows($, path)
     for (const prompt of rows.prompts) addPrompt(entries, prompt.text, prompt.uuid, prompt.at)
     endId = rows.lastAnswer
@@ -145,6 +165,7 @@ export const register: Register = (on, options) => {
 
   on('command.run', { command: 'jumps' }, async $ => {
     isCollapsed = false
+    await seed($, lastPath)
     const opened = await $.ui.open({ id: PANE, title: 'Jumps', columns: PANE_COLUMNS })
     const status = opened.isPlaced ? 'Jump list opened.' : `Jump list could not open: ${opened.reason}`
     return { text: `${status}\nHistory: ${historySource}. Row ids matching transcript ids: ${matchedRows.size}/${checkedRows.size}.` }
@@ -174,6 +195,7 @@ export const register: Register = (on, options) => {
         checkedRows.delete(id)
         matchedRows.delete(id)
       }
+      if (result === 'unknown' && isPrompt(e.props.text)) scheduleReseed($)
       if (result !== 'unchanged' && result !== 'unknown') scheduleRedraw($)
     }
     return next(e)
