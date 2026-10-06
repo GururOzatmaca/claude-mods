@@ -1,0 +1,14 @@
+{
+  "name": "jump-list",
+  "version": "0.7.0",
+  "description": "A side pane listing every prompt in the session: see where you are, click to jump back",
+  "author": { "name": "Gurur Ozatmaca" },
+  "userConfig": {
+    "open_on_start": {
+      "type": "boolean",
+      "title": "Open on start",
+      "description": "Open the jump list automatically when the terminal is wide enough (144+ columns)",
+      "default": true
+    }
+  }
+}

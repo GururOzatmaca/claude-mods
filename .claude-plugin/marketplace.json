@@ -1,0 +1,22 @@
+{
+  "name": "claude-mods",
+  "description": "Mods for Claude Code: prompt rewriting, copy buttons and tl;dr for replies, and a jump list for long sessions",
+  "owner": { "name": "Gurur Ozatmaca" },
+  "plugins": [
+    {
+      "name": "prompt-boost",
+      "source": "./prompt-boost",
+      "description": "Put ++ at the start or end of a prompt to have it rewritten into a clear prompt for review before sending"
+    },
+    {
+      "name": "reply-tools",
+      "source": "./reply-tools",
+      "description": "Copy buttons on code blocks and a one-click tl;dr of long replies"
+    },
+    {
+      "name": "jump-list",
+      "source": "./jump-list",
+      "description": "A side pane listing every prompt in the session: see where you are, click to jump back"
+    }
+  ]
+}

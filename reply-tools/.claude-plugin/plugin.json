@@ -1,0 +1,26 @@
+{
+  "name": "reply-tools",
+  "version": "0.3.0",
+  "description": "Copy buttons on code blocks and a one-click tl;dr of long replies",
+  "author": { "name": "Gurur Ozatmaca" },
+  "userConfig": {
+    "copy_buttons": {
+      "type": "boolean",
+      "title": "Copy buttons",
+      "description": "Show a copy button above each code block, and copy all on adjacent shell blocks",
+      "default": true
+    },
+    "copy_instruction": {
+      "type": "boolean",
+      "title": "Fence copyable text",
+      "description": "Tell Claude to put anything meant to be copied (commands, messages, config) in a code block",
+      "default": true
+    },
+    "tldr_button": {
+      "type": "boolean",
+      "title": "tl;dr button",
+      "description": "Show a tl;dr button under long replies (one Sonnet call per click, cached)",
+      "default": true
+    }
+  }
+}
